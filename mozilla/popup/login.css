@@ -1,0 +1,47 @@
+html, body {
+    width: 300px;
+    color: white;
+    background: linear-gradient(to bottom, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+  }
+  
+  body h2 {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0.5em;
+    text-align: center;
+  }
+
+  .center-text{
+    text-align: center;
+  }
+
+  .hidden {
+    display: none;
+  }
+  
+  .button {
+    margin: 3% auto;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 1.5em;
+    background: #45b489;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  
+  .form-input {
+    width: 100%;
+    margin: 10px;
+  }
+
+  .form-input label {
+    display: block;
+    font-size: 1.2em;
+    width: 100%;
+  }
+
+  .form-input input {
+    width: 100%;
+    display: block;
+    font-size: 1.2em;
+  }

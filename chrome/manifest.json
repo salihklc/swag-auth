@@ -1,0 +1,9 @@
+{
+    "name": "GTdesk Auth",
+    "description": "Login to tdesk app easly.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }
+}

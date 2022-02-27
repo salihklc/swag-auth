@@ -1,0 +1,30 @@
+{
+    "manifest_version": 2,
+    "name": "Tdesk Auth",
+    "version": "1.0",
+    "description": "Login to tdesk app easly.",
+    "type": "storage",
+    "icons": {
+        "48": "icons/logo.png"
+    },
+    "homepage_url": "https://tdesk.trendyol.com",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "browser_action": {
+        "default_icon": "icons/logo.png",
+        "default_title": "Tdesk Auth Helper",
+        "default_popup": "popup/login.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*/*"
+            ],
+            "js": [
+                "auth.js"
+            ]
+        }
+    ]
+}
