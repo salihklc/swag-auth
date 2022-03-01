@@ -1,4 +1,5 @@
 (function () {
+    //This js file is injected into every page and is used to authenticate the user.
     /**
      * Check and set a global guard variable.
      * If this content script is injected into the same page again,

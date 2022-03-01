@@ -20,20 +20,27 @@
                         <label for="username">Password</label>
                         <input type="password" name="password" id="password">
                     </div>
-                    <button class="button">Save</button>
+                    <div class="form-input">
+                        <button class="button" id="save-auth-btn">Save</button>
+                    </div>
                 </form>
             </div>
             <div id="error-content" class="hidden">
                 <p>Can't login to this website</p><p>Try a swagger page.</p>
             </div>
-            <script src="login.js"></script>
         </div>
         <div class="current-auth hidden">
             <h3>Current Auth For</h3>
             <div id="current-auth-content">
-                <span id="auth-username">No one</span>
+                <div class="half-container">
+                    <span id="auth-username"></span>
+                </div>
+                <div class="half-container">
+                    <button class="button" id="trigger-auth">Trigger Auth</button>
+                </div>
             </div>
             <button class="button" id="delete-auth">Logout</button>
         </div>
     </body>
+    <script src="login.js"></script>
 </html>

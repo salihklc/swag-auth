@@ -12,6 +12,11 @@
         "activeTab",
         "storage"
     ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "salih.kilic@trendyol.com"
+        }
+    },
     "browser_action": {
         "default_icon": "icons/logo.png",
         "default_title": "Tdesk Auth Helper",
@@ -23,7 +28,7 @@
                 "*://*/*"
             ],
             "js": [
-                "auth.js"
+                "login.js"
             ]
         }
     ]
