@@ -1,0 +1,62 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    width: 350px;
+    color: white;
+    background: linear-gradient(to bottom, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+  }
+  
+  body h2 {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0.5em;
+    text-align: center;
+  }
+  .authentication-user-logout {
+    margin: 0;
+    padding: 0.5em;
+    text-align: center;
+  }
+  .half-container {
+    width: 50%;
+  }
+
+  .center-text{
+    text-align: center;
+  }
+  .current-auth-content{
+    text-align: center;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .login-form {
+    padding-right: 13%;
+  }
+  
+  .button {
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 1.5em;
+    background: #45b489;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  
+  .form-input {
+    width: 100%;
+    margin: 20px;
+  }
+
+  .form-input label {
+    display: block;
+    font-size: 1.2em;
+  }
+
+  .form-input input {
+    width: 100%;
+    display: block;
+    font-size: 1.2em;
+  }

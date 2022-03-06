@@ -23,6 +23,8 @@ function onError(error) {
 initialize();
 
 function initialize() {
+    console.log("app starting..")
+    console.log("currentSite is " + currentSite);
     var currentSiteAuthInfos = browser.storage.local.get(currentSite);
     if (currentSiteAuthInfos !== undefined) {
         console.log(currentSiteAuthInfos);
@@ -32,9 +34,11 @@ function initialize() {
 
 /* Add a note to the display, and storage */
 function saveAuthInfoForCurrentSite() {
+    console.log("credentials are saving")
     var username = inputUsername.value;
     var password = inputPassword.value;
     var gettingItem = browser.storage.local.get(currentSite);
+    console.log("username: " + username + " password: ****");
     gettingItem.then((result) => {
         var objTest = Object.keys(result);
         if (objTest.length < 1 && username !== '' && password !== '') {

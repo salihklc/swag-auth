@@ -1,35 +1,24 @@
 {
+    "description": "Login to any swag UI easly.",
     "manifest_version": 2,
-    "name": "Tdesk Auth",
+    "name": "Swag Auth",
     "version": "1.0",
-    "description": "Login to tdesk app easly.",
-    "type": "storage",
+    "homepage_url": "salihklc91@gmail.com",
     "icons": {
         "48": "icons/logo.png"
     },
-    "homepage_url": "https://tdesk.trendyol.com",
     "permissions": [
         "activeTab",
         "storage"
     ],
     "browser_specific_settings": {
         "gecko": {
-            "id": "salih.kilic@trendyol.com"
+            "id": "salihklc91@gmail.com"
         }
     },
     "browser_action": {
         "default_icon": "icons/logo.png",
-        "default_title": "Tdesk Auth Helper",
+        "default_title": "Swag Auth Helper",
         "default_popup": "popup/login.html"
-    },
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*/*"
-            ],
-            "js": [
-                "login.js"
-            ]
-        }
-    ]
+    }
 }

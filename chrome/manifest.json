@@ -1,9 +1,31 @@
 {
-    "name": "GTdesk Auth",
-    "description": "Login to tdesk app easly.",
+    "name": "Swag Auth",
+    "description": "Login to any swag UI easly.",
     "version": "1.0",
     "manifest_version": 3,
-    "background": {
-        "service_worker": "background.js"
-    }
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting"
+    ],
+    "options_page": "option/options.html",
+    "action": {
+        "default_popup": "popup/login.html"
+    },
+    "icons": {
+        "16": "icons/logo.png",
+        "48": "icons/logo.png",
+        "128": "icons/logo.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_scripts/auth.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
 }
