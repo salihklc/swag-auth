@@ -2,6 +2,7 @@
 console.log("App started");
 var inputUsername = document.querySelector('#username');
 var inputPassword = document.querySelector('#password');
+var inputLoginAddress = document.querySelector('#login-address');
 var currentSite = undefined;
 var currentTab = undefined;
 var currentHost = undefined;
@@ -27,6 +28,7 @@ var saveButton = document.getElementById('save-auth-btn');
 
 saveButton.addEventListener('click', saveAuthInfoForCurrentSite);
 logoutButton.addEventListener('click', logoutForCurrentSite);
+triggerAuthButton.addEventListener('click', triggerAuth)
 
 function onError(error) {
     console.log(error);
@@ -47,24 +49,26 @@ function initialize() {
 
 function saveAuthInfoForCurrentSite() {
     console.log("credentials are saving")
-    var username = inputUsername.value;
-    var password = inputPassword.value;
-    var gettingItem = chrome.storage.local.get(currentHost);
+    let username = inputUsername.value;
+    let password = inputPassword.value;
+    let loginUrl = inputLoginAddress.value;
+    let gettingItem = chrome.storage.local.get(currentHost);
     console.log("username: " + username + " password: ****");
     gettingItem.then((result) => {
-        var objTest = Object.keys(result);
+        let objTest = Object.keys(result);
         if (objTest.length < 1 && username !== '' && password !== '') {
-            storeUserForSite(username, password);
+            let authRequestUrl = currentSite.origin + loginUrl;
+            storeUserForSite(username, password, authRequestUrl);
         }
         clearLoginInputHideLoginShowLogout()
     }, onError);
 }
 
-function storeUserForSite(username, password) {
-    authInfo[currentHost] = { "username": username, "password": password };
-    var storingUserInfo = chrome.storage.local.set(authInfo);
+function storeUserForSite(username, password, url) {
+    authInfo[currentHost] = { "username": username, "password": password, "url": url };
+    let storingUserInfo = chrome.storage.local.set(authInfo);
     storingUserInfo.then(() => {
-        triggerAuth(username, password);
+        triggerAuth();
     }, onError);
 }
 
@@ -89,12 +93,40 @@ function showLoginHideLogout() {
     document.querySelector('.current-auth').classList.add('hidden');
 }
 
-function triggerAuth(username, password) {
-    //Auth to swagger 
-    console.log("triggerAuth" + username + " " + password);
+async function triggerAuth() {
+    console.log("triggerAuth" + authInfo[currentHost]["username"] + " " + authInfo[currentHost]["password"]);
+    var authResult = await fetch(authInfo[currentHost]["url"], {
+        method: 'POST',
+        // mode: 'cors',cache: 'no-cache',credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({ "username": authInfo[currentHost]["username"], "password": authInfo[currentHost]["password"] })
+    });
+
+    if (authResult.status === 200) {
+        authResult.json().then(function (data) {
+            injectTokenToTab(data["token"])
+        }).catch(function (error) {
+            console.log()
+        });
+    } else {
+        showLoginErrors(authResult.status + ":" + authResult.statusText);
+    }
 }
 
-function injectScriptToTab() {
+function showLoginErrors(message) {
+    document.getElementById('error-content').classList.remove('hidden');
+    document.getElementById('error-message').innerHTML = message;
+    setInterval(function () {
+        document.getElementById('error-content').classList.add('hidden');
+    }, 3000)
+}
+
+function injectTokenToTab(token) {
+    console.log("injectTokenToTab :" + token);
     chrome.scripting.executeScript({
         target: { tabId: currentTab.id },
         files: ['content_scripts/auth.js']
