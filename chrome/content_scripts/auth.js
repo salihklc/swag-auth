@@ -42,7 +42,11 @@ function addTokenToInput() {
 
     if (tokenInput != null && tokenInput != undefined) {
         tokenInput.value = contentToken;
+        tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     document.querySelector(".btn.modal-btn.auth.authorize.button").click();
+    setTimeout(function () {
+        document.querySelector(".btn.modal-btn.auth.btn-done.button").click();
+    }, 500)
 }
