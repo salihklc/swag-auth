@@ -48,6 +48,7 @@ function initialize() {
             clearLoginInputHideLoginShowLogout();
         }
     });
+    document.querySelector("div.page-content").style.display = "block";
     loadingDiv(false);
 }
 
@@ -145,4 +146,6 @@ function loadingDiv(show) {
     else
         document.querySelector('.loading-div').classList.add('hidden');
 }
+
 console.log("load complete");
+
