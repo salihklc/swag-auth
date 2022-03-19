@@ -1,5 +1,5 @@
 /* initialise variables */
-console.log("App started");
+console.log("App loading");
 var inputUsername = document.querySelector('#username');
 var inputPassword = document.querySelector('#password');
 var inputLoginAddress = document.querySelector('#login-address');
@@ -56,7 +56,8 @@ function saveAuthInfoForCurrentSite() {
     console.log("username: " + username + " password: ****");
     gettingItem.then((result) => {
         let objTest = Object.keys(result);
-        if (objTest.length < 1 && username !== '' && password !== '') {
+        if (objTest.length < 1 && username !== '' && password !== '' ||
+            (objTest.length > 0 && objTest[currentHost] == undefined)) {
             let authRequestUrl = currentSite.origin + loginUrl;
             storeUserForSite(username, password, authRequestUrl);
         }
@@ -75,7 +76,7 @@ function storeUserForSite(username, password, url) {
 function logoutForCurrentSite() {
     showLoginHideLogout();
     authInfo[currentHost] = {}
-    chrome.storage.local.set({ authInfo });
+    chrome.storage.local.set(authInfo);
 }
 
 function clearLoginInputHideLoginShowLogout() {
@@ -107,10 +108,10 @@ async function triggerAuth() {
     });
 
     if (authResult.status === 200) {
-        authResult.json().then(function (data) {
-            injectTokenToTab(data["token"])
+        authResult.json().then(function (response) {
+            injectTokenToTab(response["data"]["token"])
         }).catch(function (error) {
-            console.log()
+            console.log(error)
         });
     } else {
         showLoginErrors(authResult.status + ":" + authResult.statusText);
@@ -127,10 +128,20 @@ function showLoginErrors(message) {
 
 function injectTokenToTab(token) {
     console.log("injectTokenToTab :" + token);
-    chrome.scripting.executeScript({
-        target: { tabId: currentTab.id },
-        files: ['content_scripts/auth.js']
+    // chrome.scripting.executeScript({
+    //     target: { tabId: currentTab.id },
+    //     file: 'content_scripts/auth.js',
+    //     function() {
+    //         chrome.tabs.sendMessage(currentTab.id, 'token;' + token);
+    //     }
+    // });
+
+    let message = { token: token }
+
+    chrome.tabs.sendMessage(currentTab.id, message, function (response) {
+        console.log("token injected");
     });
+
 }
 
-console.log("App ended");
+console.log("load complete");
