@@ -2,23 +2,57 @@ html, body {
     padding: 0;
     margin: 0;
     width: 350px;
+    height: auto;
     color: white;
-    background: linear-gradient(to bottom, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+    background: rgb(56, 91, 102);
+    font-family: Arial, Helvetica, sans-serif;
   }
   
   body h2 {
-    font-size: 1.5em;
-    margin: 0;
-    padding: 0.5em;
     text-align: center;
   }
   .authentication-user-logout {
-    margin: 0;
-    padding: 0.5em;
     text-align: center;
   }
+  .loading-div{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background: rgba(31, 31, 31, 0.6);
+    text-align: center;
+    vertical-align: center;
+  }
+
+  .loading-div .spinner {
+    border: 5px solid #f3f3f3;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+    border-top: 5px solid #555;
+    border-radius: 50%;
+    margin: 40%;
+    width: 50px;
+    height: 50px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   .half-container {
+    margin: 10px;
     width: 50%;
+    vertical-align: middle;
+  }
+
+  .full-center{
+    width: 100%;
+    text-align: center;
+  }
+
+  .container{
+    display: flex;
   }
 
   .center-text{
@@ -40,7 +74,7 @@ html, body {
     padding: 5px 10px;
     text-align: center;
     font-size: 1.5em;
-    background: #45b489;
+    background: #9bdbc3;
     cursor: pointer;
     border-radius: 10px;
   }
@@ -58,5 +92,7 @@ html, body {
   .form-input input {
     width: 100%;
     display: block;
+    border-radius: 4px;
+    border: 1px solid #ccc;
     font-size: 1.2em;
   }

@@ -4,11 +4,11 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="login.css" />
     </head>
-    <div class="center-text">
-        <h2>Swag Auth Helper</h2>
-        <h4>Fill the form to auth : <span class="current-site-name">CurrentSite</span></h3>
-    </div>
     <body>
+        <div class="center-text">
+            <h2>Swag Auth Helper</h2>
+            <h4>Fill the form to auth : <span class="current-site-name">CurrentSite</span></h3>
+        </div>
         <div class="login-form">
             <div id="popup-content">
                 <div class="form-input">
@@ -30,18 +30,27 @@
         </div>
         <div class="current-auth hidden">
             <div id="current-auth-content">
-                <div class="half-container">
+                <div class="full-center">
                     <span> Current Auth For: <span id="auth-username"></span></span>
                 </div>
-                <div class="half-container">
-                    <button class="button" id="trigger-auth">Trigger Auth</button>
+                <div class="container">
+                    <div class="half-container">
+                        <button class="button full-center" id="trigger-auth">Trigger
+                            Auth</button>
+                    </div>
+                    <div class="half-container">
+                        <button class="button full-center" id="delete-auth">Logout</button>
+                    </div>
                 </div>
             </div>
-            <button class="button" id="delete-auth">Logout</button>
+
         </div>
         <div id="error-content" class="hidden">
             <p>Can't login to this <span class="current-site-name"></span></p>
             <p id="error-message"></p>
+        </div>
+        <div class="loading-div hidden">
+            <div class="spinner"></div>
         </div>
         <script src="login.js"></script>
     </body>

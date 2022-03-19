@@ -1,5 +1,7 @@
 /* initialise variables */
 console.log("App loading");
+loadingDiv(true);
+
 var inputUsername = document.querySelector('#username');
 var inputPassword = document.querySelector('#password');
 var inputLoginAddress = document.querySelector('#login-address');
@@ -32,6 +34,7 @@ triggerAuthButton.addEventListener('click', triggerAuth)
 
 function onError(error) {
     console.log(error);
+    loadingDiv(false);
 }
 
 function initialize() {
@@ -45,6 +48,7 @@ function initialize() {
             clearLoginInputHideLoginShowLogout();
         }
     });
+    loadingDiv(false);
 }
 
 function saveAuthInfoForCurrentSite() {
@@ -95,10 +99,9 @@ function showLoginHideLogout() {
 }
 
 async function triggerAuth() {
-    console.log("triggerAuth" + authInfo[currentHost]["username"] + " " + authInfo[currentHost]["password"]);
+    loadingDiv(true);
     var authResult = await fetch(authInfo[currentHost]["url"], {
         method: 'POST',
-        // mode: 'cors',cache: 'no-cache',credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -116,6 +119,7 @@ async function triggerAuth() {
     } else {
         showLoginErrors(authResult.status + ":" + authResult.statusText);
     }
+    loadingDiv(false);
 }
 
 function showLoginErrors(message) {
@@ -127,21 +131,18 @@ function showLoginErrors(message) {
 }
 
 function injectTokenToTab(token) {
-    console.log("injectTokenToTab :" + token);
-    // chrome.scripting.executeScript({
-    //     target: { tabId: currentTab.id },
-    //     file: 'content_scripts/auth.js',
-    //     function() {
-    //         chrome.tabs.sendMessage(currentTab.id, 'token;' + token);
-    //     }
-    // });
-
     let message = { token: token }
-
     chrome.tabs.sendMessage(currentTab.id, message, function (response) {
         console.log("token injected");
+        loadingDiv(false);
     });
 
 }
 
+function loadingDiv(show) {
+    if (show)
+        document.querySelector('.loading-div').classList.remove('hidden');
+    else
+        document.querySelector('.loading-div').classList.add('hidden');
+}
 console.log("load complete");
