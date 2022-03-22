@@ -37,13 +37,15 @@ function onError(error) {
     loadingDiv(false);
 }
 
+var ff = "";
 function initialize() {
     console.log("app starting..")
     console.log("currentSite: " + currentSite);
     document.querySelector('span.current-site-name').innerHTML = currentHost;
     chrome.storage.local.get(currentHost, function (savedItem) {
         console.log(savedItem);
-        if (savedItem !== undefined) {
+
+        if (savedItem !== undefined && savedItem[currentHost] !== undefined && savedItem[currentHost].username !== undefined && savedItem[currentHost].password !== undefined) {
             authInfo = savedItem;
             clearLoginInputHideLoginShowLogout();
         }
@@ -85,7 +87,7 @@ function logoutForCurrentSite() {
 }
 
 function clearLoginInputHideLoginShowLogout() {
-    console.log(inputUsername + " " + inputPassword + " " + authInfo[currentHost].username);
+    console.log(authInfo[currentHost].username);
     document.querySelector('span#auth-username').innerHTML = authInfo[currentHost].username;
     inputUsername.value = '';
     inputPassword.value = '';
