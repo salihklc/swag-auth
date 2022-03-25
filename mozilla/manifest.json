@@ -3,19 +3,30 @@
     "manifest_version": 2,
     "name": "Swag Auth",
     "version": "1.0",
-    "homepage_url": "salihklc91@gmail.com",
+    "homepage_url": "https://github.com/salihklc/swag-auth",
     "icons": {
         "48": "icons/logo.png"
     },
     "permissions": [
         "activeTab",
-        "storage"
+        "storage",
+        "webRequest"
     ],
     "browser_specific_settings": {
         "gecko": {
             "id": "salihklc91@gmail.com"
         }
     },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_scripts/auth.js"
+            ]
+        }
+    ],
     "browser_action": {
         "default_icon": "icons/logo.png",
         "default_title": "Swag Auth Helper",

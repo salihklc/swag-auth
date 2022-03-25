@@ -1,49 +1,52 @@
-(function () {
-    //This js file is injected into every page and is used to authenticate the user.
-    /**
-     * Check and set a global guard variable.
-     * If this content script is injected into the same page again,
-     * it will do nothing next time.
-     */
-    if (window.hasRun) {
-        return;
-    }
-    window.hasRun = true;
+console.log("app loaded")
+var contentToken = ""
 
-    /**
-     * Given a URL to a beast image, remove all existing beasts, then
-     * create and style an IMG node pointing to
-     * that image, then insert the node into the document.
-     */
-    function insertBeast(beastURL) {
-        removeExistingBeasts();
-        let beastImage = document.createElement("img");
-        beastImage.setAttribute("src", beastURL);
-        beastImage.style.height = "100vh";
-        beastImage.className = "beastify-image";
-        document.body.appendChild(beastImage);
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    // Handle message.
+    // In this example, message === 'whatever value; String, object, whatever'
+    console.log(message);
+    console.log(sender);
+    console.log(sendResponse);
+    if (message["token"] != undefined) {
+        contentToken = message["token"];
+        login();
     }
+});
 
-    /**
-     * Remove every beast from the page.
-     */
-    function removeExistingBeasts() {
-        let existingBeasts = document.querySelectorAll(".beastify-image");
-        for (let beast of existingBeasts) {
-            beast.remove();
-        }
+function login() {
+    logoutOldSwagger();
+    addTokenToInput();
+
+}
+
+function logoutOldSwagger() {
+    let logoutModalBtn = document.querySelector(".btn.authorize.locked");
+    if (logoutModalBtn != null && logoutModalBtn != undefined) {
+        logoutModalBtn.click();
     }
 
-    /**
-     * Listen for messages from the background script.
-     * Call "insertBeast()" or "removeExistingBeasts()".
-     */
-    browser.runtime.onMessage.addListener((message) => {
-        if (message.command === "beastify") {
-            insertBeast(message.beastURL);
-        } else if (message.command === "reset") {
-            removeExistingBeasts();
-        }
-    });
+    let logoutButton = document.querySelector(".btn.modal-btn.auth.button");
+    if (logoutButton != null && logoutButton != undefined) {
+        logoutButton.click();
+    }
+}
 
-})();
+function addTokenToInput() {
+    let closestDiv = document.querySelector(".btn.authorize.unlocked").closest("div.auth-wrapper");
+    let loginPopupButton = document.querySelector(".btn.authorize.unlocked");
+
+    if (closestDiv != null && closestDiv != undefined) {
+        loginPopupButton.click();
+    }
+    let tokenInput = closestDiv.querySelector("input");
+
+    if (tokenInput != null && tokenInput != undefined) {
+        tokenInput.value = contentToken;
+        tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    document.querySelector(".btn.modal-btn.auth.authorize.button").click();
+    setTimeout(function () {
+        document.querySelector(".btn.modal-btn.auth.btn-done.button").click();
+    }, 500)
+}

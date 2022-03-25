@@ -4,14 +4,19 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="login.css" />
     </head>
-    <div class="center-text">
-        <h2>Swag Auth Helper</h2>
-        <h4>Fill the form to auth : <span>CurrentSite</span></h3>
-    </div>
     <body>
-        <div class="login-form">
-            <div id="popup-content">
-                <form action="" name="login-form" id="login-form">
+        <div class="page-content">
+            <div class="center-text">
+                <h2>Swag Auth Helper</h2>
+                <h4>Fill the form to auth : <span class="current-site-name">CurrentSite</span></h3>
+            </div>
+            <div class="login-form">
+                <div id="popup-content">
+                    <div class="form-input">
+                        <label for="login-address">Login Url</label>
+                        <input type="text" name="login-address"
+                            id="login-address">
+                    </div>
                     <div class="form-input">
                         <label for="username">Username</label>
                         <input type="text" name="username" id="username">
@@ -23,23 +28,32 @@
                     <div class="form-input">
                         <button class="button" id="save-auth-btn">Save</button>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="current-auth hidden">
+                <div id="current-auth-content">
+                    <div class="full-center">
+                        <span> Current Auth For: <span id="auth-username"></span></span>
+                    </div>
+                    <div class="container">
+                        <div class="half-container">
+                            <button class="button full-center"
+                                id="trigger-auth">Trigger
+                                Auth</button>
+                        </div>
+                        <div class="half-container">
+                            <button class="button full-center" id="delete-auth">Logout</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="error-content" class="hidden">
-                <p>Can't login to this website</p><p>Try a swagger page.</p>
+                <p>Can't login to this <span class="current-site-name"></span></p>
+                <p id="error-message"></p>
             </div>
         </div>
-        <div class="current-auth hidden">
-            <h3>Current Auth For</h3>
-            <div id="current-auth-content">
-                <div class="half-container">
-                    <span id="auth-username"></span>
-                </div>
-                <div class="half-container">
-                    <button class="button" id="trigger-auth">Trigger Auth</button>
-                </div>
-            </div>
-            <button class="button" id="delete-auth">Logout</button>
+        <div class="loading-div">
+            <div class="spinner"></div>
         </div>
         <script src="login.js"></script>
     </body>
