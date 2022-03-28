@@ -9,7 +9,6 @@
         "scripting",
         "webRequest"
     ],
-    "options_page": "option/options.html",
     "action": {
         "default_popup": "popup/login.html"
     },
