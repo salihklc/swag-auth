@@ -8,27 +8,36 @@ var inputLoginAddress = document.querySelector('#login-address');
 var currentSite = undefined;
 var currentTab = undefined;
 var currentHost = undefined;
-var authInfo = {}
+var authInfoGlobal = {}
+var appBrowserGlobal = undefined;
 
-chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-    let tab = tabs[0]
-    var currentTabUrl = "";
-    if (tab == undefined || tab.url == undefined) {
-        currentTabUrl = 'https://google.com'
-    } else {
-        currentTabUrl = tab.url;
+
+function appStart() {
+    try {
+        appBrowserGlobal = chrome;
+        appBrowserGlobal.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+            let tab = tabs[0]
+            var currentTabUrl = "";
+            if (tab == undefined || tab.url == undefined) {
+                currentTabUrl = 'https://google.com'
+            } else {
+                currentTabUrl = tab.url;
+            }
+            currentSite = new URL(currentTabUrl);
+            currentTab = tabs[0];
+            currentHost = currentSite.hostname;
+            initialize();
+        });
+    } catch (e) {
+        onError(e)
     }
-    currentSite = new URL(currentTabUrl);
-    currentTab = tabs[0];
-    currentHost = currentSite.hostname;
-    initialize();
-});
+}
 
 var triggerAuthButton = document.getElementById("trigger-auth")
 var logoutButton = document.getElementById("delete-auth")
 var saveButton = document.getElementById('save-auth-btn');
 
-saveButton.addEventListener('click', saveAuthInfoForCurrentSite);
+saveButton.addEventListener('click', authAndSaveUserInfo);
 logoutButton.addEventListener('click', logoutForCurrentSite);
 triggerAuthButton.addEventListener('click', triggerAuth)
 
@@ -37,16 +46,13 @@ function onError(error) {
     loadingDiv(false);
 }
 
-var ff = "";
 function initialize() {
-    console.log("app starting..")
-    console.log("currentSite: " + currentSite);
     document.querySelector('span.current-site-name').innerHTML = currentHost;
-    chrome.storage.local.get(currentHost, function (savedItem) {
+    appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
         console.log(savedItem);
 
         if (savedItem !== undefined && savedItem[currentHost] !== undefined && savedItem[currentHost].username !== undefined && savedItem[currentHost].password !== undefined) {
-            authInfo = savedItem;
+            authInfoGlobal = savedItem;
             clearLoginInputHideLoginShowLogout();
         }
     });
@@ -54,41 +60,31 @@ function initialize() {
     loadingDiv(false);
 }
 
-function saveAuthInfoForCurrentSite() {
-    console.log("credentials are saving")
-    let username = inputUsername.value;
-    let password = inputPassword.value;
-    let loginUrl = inputLoginAddress.value;
-    let gettingItem = chrome.storage.local.get(currentHost);
-    console.log("username: " + username + " password: ****");
+function authAndSaveUserInfo() {
+    let authRequestUrl = currentSite.origin + inputLoginAddress.value;
+    let gettingItem = appBrowserGlobal.storage.local.get(currentHost);
+
     gettingItem.then((result) => {
         let objTest = Object.keys(result);
-        if (objTest.length < 1 && username !== '' && password !== '' ||
-            (objTest.length > 0 && objTest[currentHost] == undefined)) {
-            let authRequestUrl = currentSite.origin + loginUrl;
-            storeUserForSite(username, password, authRequestUrl);
+        if (objTest.length < 1 && username !== '' && password !== '' || (objTest.length > 0 && objTest[currentHost] == undefined)) {
+            authInfoGlobal[currentHost] = {
+                "username": inputUsername.value,
+                "password": inputPassword.value,
+                "url": authRequestUrl
+            };
+            triggerAuth();
         }
-        clearLoginInputHideLoginShowLogout()
-    }, onError);
-}
-
-function storeUserForSite(username, password, url) {
-    authInfo[currentHost] = { "username": username, "password": password, "url": url };
-    let storingUserInfo = chrome.storage.local.set(authInfo);
-    storingUserInfo.then(() => {
-        triggerAuth();
     }, onError);
 }
 
 function logoutForCurrentSite() {
     showLoginHideLogout();
-    authInfo[currentHost] = {}
-    chrome.storage.local.set(authInfo);
+    authInfoGlobal[currentHost] = {}
+    appBrowserGlobal.storage.local.set(authInfoGlobal);
 }
 
 function clearLoginInputHideLoginShowLogout() {
-    console.log(authInfo[currentHost].username);
-    document.querySelector('span#auth-username').innerHTML = authInfo[currentHost].username;
+    document.querySelector('span#auth-username').innerHTML = authInfoGlobal[currentHost].username;
     inputUsername.value = '';
     inputPassword.value = '';
     document.querySelector('.current-auth').classList.remove('hidden')
@@ -103,43 +99,57 @@ function showLoginHideLogout() {
 
 async function triggerAuth() {
     loadingDiv(true);
-    var authResult = await fetch(authInfo[currentHost]["url"], {
+
+    await fetch(authInfoGlobal[currentHost]["url"], {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-        body: JSON.stringify({ "username": authInfo[currentHost]["username"], "password": authInfo[currentHost]["password"] })
-    });
-
-    if (authResult.status === 200) {
-        authResult.json().then(function (response) {
+        body: JSON.stringify({ "username": authInfoGlobal[currentHost]["username"], "password": authInfoGlobal[currentHost]["password"] })
+    })
+        .then(response => {
+            if (response.status == 200) {
+                return response.json();
+            }
+            return response.json().then(res => { throw new Error(res.message) });
+        })
+        .then(response => {
+            storeUserForSite();
             injectTokenToTab(response["data"]["token"])
-        }).catch(function (error) {
-            console.log(error)
+            clearLoginInputHideLoginShowLogout();
+        })
+        .catch((error) => {
+            console.log(error);
+            showLoginErrors(error.message);
         });
-    } else {
-        showLoginErrors(authResult.status + ":" + authResult.statusText);
-    }
+
     loadingDiv(false);
 }
 
 function showLoginErrors(message) {
     document.getElementById('error-content').classList.remove('hidden');
     document.getElementById('error-message').innerHTML = message;
-    setInterval(function () {
+    setTimeout(function () {
         document.getElementById('error-content').classList.add('hidden');
     }, 3000)
 }
 
+
+function storeUserForSite() {
+    var storingUserInfo = appBrowserGlobal.storage.local.set(authInfoGlobal);
+    storingUserInfo.then(() => {
+        console.log("user info stored");
+    }, onError);
+}
+
 function injectTokenToTab(token) {
     let message = { token: token }
-    chrome.tabs.sendMessage(currentTab.id, message, function (response) {
+    appBrowserGlobal.tabs.sendMessage(currentTab.id, message, function (response) {
         console.log("token injected");
         loadingDiv(false);
     });
-
 }
 
 function loadingDiv(show) {
@@ -150,4 +160,4 @@ function loadingDiv(show) {
 }
 
 console.log("load complete");
-
+appStart();
