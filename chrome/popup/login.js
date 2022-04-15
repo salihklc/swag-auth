@@ -8,6 +8,7 @@ var inputLoginAddress = document.querySelector('#login-address');
 var currentSite = undefined;
 var currentTab = undefined;
 var currentHost = undefined;
+var currentToken = undefined;
 var authInfoGlobal = {}
 var appBrowserGlobal = undefined;
 
@@ -36,10 +37,12 @@ function appStart() {
 var triggerAuthButton = document.getElementById("trigger-auth")
 var logoutButton = document.getElementById("delete-auth")
 var saveButton = document.getElementById('save-auth-btn');
+var copyToClipboardButton = document.querySelector('#copy-to-clipboard');
 
 saveButton.addEventListener('click', authAndSaveUserInfo);
 logoutButton.addEventListener('click', logoutForCurrentSite);
 triggerAuthButton.addEventListener('click', triggerAuth)
+copyToClipboardButton.addEventListener('click', copyToClipboard)
 
 function onError(error) {
     console.log(error);
@@ -70,7 +73,8 @@ function authAndSaveUserInfo() {
             authInfoGlobal[currentHost] = {
                 "username": inputUsername.value,
                 "password": inputPassword.value,
-                "url": authRequestUrl
+                "url": authRequestUrl,
+                "token": ""
             };
             triggerAuth();
         }
@@ -116,19 +120,30 @@ async function triggerAuth() {
             return response.json().then(res => { throw new Error(res.message) });
         })
         .then(response => {
+            authInfoGlobal[currentHost]["token"] = response["data"]["token"];
             storeUserForSite();
             injectTokenToTab(response["data"]["token"])
             clearLoginInputHideLoginShowLogout();
         })
         .catch((error) => {
             console.log(error);
-            showLoginErrors(error.message);
+            showMessages(error.message);
         });
 
     loadingDiv(false);
 }
 
-function showLoginErrors(message) {
+async function copyToClipboard() {
+    if (currentToken != undefined) {
+        await navigator.clipboard.writeText(currentToken).then(() => {
+            showMessages("token copied to clipboard")
+        });
+    } else {
+        showMessages("cannot copy to clipboard")
+    }
+}
+
+function showMessages(message) {
     document.getElementById('error-content').classList.remove('hidden');
     document.getElementById('error-message').innerHTML = message;
     setTimeout(function () {
@@ -146,6 +161,7 @@ function storeUserForSite() {
 
 function injectTokenToTab(token) {
     let message = { token: token }
+    currentToken = token
     appBrowserGlobal.tabs.sendMessage(currentTab.id, message, function (response) {
         console.log("token injected");
         loadingDiv(false);

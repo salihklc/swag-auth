@@ -58,14 +58,21 @@ body h2 {
 }
 
 .icon-clipboard {
-  width: 10px;
-  height: 10px;
-  background-image: url(../icons/clipboard.png) no-repeat;
+  width: 15px;
+  height: 15px;
+  background: url(../icons/clipboard-15.png) no-repeat;
+  display: inline-block;
 }
 
 .half-container {
   margin: 5px;
   width: 50%;
+  vertical-align: middle;
+}
+
+.full-container {
+  margin: 5px;
+  width: 100%;
   vertical-align: middle;
 }
 
@@ -101,6 +108,11 @@ body h2 {
   background: #9bdbc3;
   cursor: pointer;
   border-radius: 10px;
+}
+
+.no-border-background {
+  background: none;
+  border: none;
 }
 
 .form-input {

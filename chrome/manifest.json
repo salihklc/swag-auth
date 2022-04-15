@@ -8,7 +8,7 @@
         "activeTab",
         "scripting",
         "webRequest",
-        "clipboard"
+        "clipboardWrite"
     ],
     "action": {
         "default_popup": "popup/login.html"
