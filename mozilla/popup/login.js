@@ -47,7 +47,7 @@ function onError(error) {
 }
 
 function initialize() {
-    document.querySelector('span.current-site-name').innerHTML = currentHost;
+    document.querySelector('span.current-site-name').textContent = currentHost;
     appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
         console.log(savedItem);
 
@@ -84,7 +84,7 @@ function logoutForCurrentSite() {
 }
 
 function clearLoginInputHideLoginShowLogout() {
-    document.querySelector('span#auth-username').innerHTML = authInfoGlobal[currentHost].username;
+    document.querySelector('span#auth-username').textContent = authInfoGlobal[currentHost].username;
     inputUsername.value = '';
     inputPassword.value = '';
     document.querySelector('.current-auth').classList.remove('hidden')
@@ -92,7 +92,7 @@ function clearLoginInputHideLoginShowLogout() {
 }
 
 function showLoginHideLogout() {
-    document.querySelector('span#auth-username').innerHTML = "";
+    document.querySelector('span#auth-username').textContent = "";
     document.querySelector('.login-form').classList.remove('hidden');
     document.querySelector('.current-auth').classList.add('hidden');
 }
@@ -130,7 +130,7 @@ async function triggerAuth() {
 
 function showLoginErrors(message) {
     document.getElementById('error-content').classList.remove('hidden');
-    document.getElementById('error-message').innerHTML = message;
+    document.getElementById('error-message').textContent = message;
     setTimeout(function () {
         document.getElementById('error-content').classList.add('hidden');
     }, 3000)

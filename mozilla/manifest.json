@@ -5,12 +5,14 @@
     "version": "1.0",
     "homepage_url": "https://github.com/salihklc/swag-auth",
     "icons": {
-        "48": "icons/logo.png"
+        "48": "icons/logo-48.png",
+        "96": "icons/logo-96.png"
     },
     "permissions": [
         "activeTab",
         "storage",
-        "webRequest"
+        "webRequest",
+        "clipboardWrite"
     ],
     "browser_specific_settings": {
         "gecko": {

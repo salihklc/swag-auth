@@ -57,8 +57,14 @@ body h2 {
   }
 }
 
+.icon-clipboard {
+  width: 10px;
+  height: 10px;
+  background-image: url(../icons/clipboard.png) no-repeat;
+}
+
 .half-container {
-  margin: 10px;
+  margin: 5px;
   width: 50%;
   vertical-align: middle;
 }
