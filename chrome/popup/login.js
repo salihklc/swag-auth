@@ -5,13 +5,26 @@ loadingDiv(true);
 var inputUsername = document.querySelector('#username');
 var inputPassword = document.querySelector('#password');
 var inputLoginAddress = document.querySelector('#login-address');
+var currentAuthDropdown = document.getElementById("current-auth-dropdown")
+var refreshAuth = document.getElementById("refresh-auth")
+var logoutButton = document.getElementById("delete-auth")
+var loginButton = document.getElementById('login-btn');
+var copyToClipboardButton = document.querySelector('#copy-to-clipboard');
+
 var currentSite = undefined;
 var currentTab = undefined;
 var currentHost = undefined;
 var currentToken = undefined;
 var authInfoGlobal = {}
 var appBrowserGlobal = undefined;
+var selectedAuth = undefined;
 
+
+loginButton.addEventListener('click', authAndSaveUserInfo);
+logoutButton.addEventListener('click', removeSelectedUser);
+refreshAuth.addEventListener('click', triggerAuth)
+copyToClipboardButton.addEventListener('click', copyToClipboard)
+currentAuthDropdown.addEventListener('change', authUserDropDownChanged)
 
 function appStart() {
     try {
@@ -34,32 +47,22 @@ function appStart() {
     }
 }
 
-var triggerAuthButton = document.getElementById("trigger-auth")
-var logoutButton = document.getElementById("delete-auth")
-var saveButton = document.getElementById('save-auth-btn');
-var copyToClipboardButton = document.querySelector('#copy-to-clipboard');
-
-saveButton.addEventListener('click', authAndSaveUserInfo);
-logoutButton.addEventListener('click', logoutForCurrentSite);
-triggerAuthButton.addEventListener('click', triggerAuth)
-copyToClipboardButton.addEventListener('click', copyToClipboard)
-
-function onError(error) {
-    console.log(error);
-    loadingDiv(false);
-}
-
 function initialize() {
-    document.querySelector('span.current-site-name').innerHTML = currentHost;
+    document.querySelector('span.current-site-name').textContent = currentHost;
     appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
         console.log(savedItem);
-
-        if (savedItem !== undefined && savedItem[currentHost] !== undefined && savedItem[currentHost].username !== undefined && savedItem[currentHost].password !== undefined) {
+        if (savedItem !== undefined && savedItem[currentHost] !== undefined) {
             authInfoGlobal = savedItem;
-            clearLoginInputHideLoginShowLogout();
+            renderCurrentAuthDropdown();
+            clearAndHideLoginShowLogout();
         }
     });
     document.querySelector("div.page-content").style.display = "block";
+    loadingDiv(false);
+}
+
+function onError(error) {
+    console.log(error);
     loadingDiv(false);
 }
 
@@ -70,48 +73,55 @@ function authAndSaveUserInfo() {
     gettingItem.then((result) => {
         let objTest = Object.keys(result);
         if (objTest.length < 1 && username !== '' && password !== '' || (objTest.length > 0 && objTest[currentHost] == undefined)) {
-            authInfoGlobal[currentHost] = {
+            authInfoGlobal[currentHost][inputUsername.value] = {
                 "username": inputUsername.value,
                 "password": inputPassword.value,
                 "url": authRequestUrl,
                 "token": ""
             };
+            selectedAuth = authInfoGlobal[currentHost][inputUsername.value];
             triggerAuth();
         }
     }, onError);
 }
 
-function logoutForCurrentSite() {
+function removeSelectedUser() {
     showLoginHideLogout();
-    authInfoGlobal[currentHost] = {}
-    appBrowserGlobal.storage.local.set(authInfoGlobal);
+    delete authInfoGlobal[currentHost][selectedAuth]
+    let dbSetCallBack = appBrowserGlobal.storage.local.set(authInfoGlobal);
+    dbSetCallBack.then(() => {
+        renderCurrentAuthDropdown()
+    }, onError);
 }
 
-function clearLoginInputHideLoginShowLogout() {
-    document.querySelector('span#auth-username').innerHTML = authInfoGlobal[currentHost].username;
+function clearAndHideLoginShowLogout() {
     inputUsername.value = '';
     inputPassword.value = '';
-    document.querySelector('.current-auth').classList.remove('hidden')
+    document.querySelector('.current-auth-content').classList.remove('hidden')
     document.querySelector('.login-form').classList.add('hidden');
 }
 
 function showLoginHideLogout() {
-    document.querySelector('span#auth-username').innerHTML = "";
     document.querySelector('.login-form').classList.remove('hidden');
-    document.querySelector('.current-auth').classList.add('hidden');
+    document.querySelector('.current-auth-content').classList.add('hidden');
+}
+
+function authUserDropDownChanged() {
+    selectedAuth = currentAuthDropdown.value;
+    triggerAuth()
 }
 
 async function triggerAuth() {
     loadingDiv(true);
-
-    await fetch(authInfoGlobal[currentHost]["url"], {
+    let authUserInfo = authInfoGlobal[currentHost][selectedAuth];
+    await fetch(authUserInfo["url"], {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-        body: JSON.stringify({ "username": authInfoGlobal[currentHost]["username"], "password": authInfoGlobal[currentHost]["password"] })
+        body: JSON.stringify({ "username": authUserInfo["username"], "password": authUserInfo["password"] })
     })
         .then(response => {
             if (response.status == 200) {
@@ -120,10 +130,10 @@ async function triggerAuth() {
             return response.json().then(res => { throw new Error(res.message) });
         })
         .then(response => {
-            authInfoGlobal[currentHost]["token"] = response["data"]["token"];
+            authUserInfo["token"] = response["data"]["token"];
             storeUserForSite();
             injectTokenToTab(response["data"]["token"])
-            clearLoginInputHideLoginShowLogout();
+            clearAndHideLoginShowLogout();
         })
         .catch((error) => {
             console.log(error);
@@ -151,12 +161,24 @@ function showMessages(message) {
     }, 3000)
 }
 
-
 function storeUserForSite() {
+    authInfoGlobal[currentHost][selectedAuth] = selectedAuth;
     var storingUserInfo = appBrowserGlobal.storage.local.set(authInfoGlobal);
     storingUserInfo.then(() => {
-        console.log("user info stored");
+        renderCurrentAuthDropdown()
     }, onError);
+}
+
+function renderCurrentAuthDropdown() {
+    var dropDown = document.getElementById("current-auth-dropdown");
+    while (dropDown.options.length) {
+        dropDown.remove(0);
+    }
+    for (var user in authInfoGlobal[currentHost]) {
+        var option = document.createElement("option");
+        option.text = user;
+        dropDown.add(option);
+    }
 }
 
 function injectTokenToTab(token) {

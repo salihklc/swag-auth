@@ -70,19 +70,30 @@ body h2 {
   vertical-align: middle;
 }
 
-.full-container {
+.container-full {
   margin: 5px;
   width: 100%;
   vertical-align: middle;
 }
 
-.full-center {
+.center-full {
   width: 100%;
+  text-align: center;
+}
+
+.center-70 {
+  width: 70%;
+  text-align: center;
+}
+
+.center-20 {
+  width: 20%;
   text-align: center;
 }
 
 .container {
   display: flex;
+  padding: 0 5px;
 }
 
 .center-text,.current-auth-content {
@@ -124,8 +135,14 @@ body h2 {
   letter-spacing: 1px;
 }
 
-.form-input input, .container input {
-  width: 100%;
+.container span{
+  font-size: 0.9em;
+  color: #6C6C6C;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+input, select {
   display: block;
   font-size: 1.2em;
   background-color: #1A2226;
@@ -136,17 +153,25 @@ body h2 {
   font-weight: bold;
   outline: 0;
   padding-left: 0px;
+  width: 100%;
   color: #ECF0F5;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
 }
 
-.form-input .button, .container .button {
+input:* {
+  background-color: #1A2226;
+}
+
+.button{
   background: #0DB8DE;
-  width:100%;
   color: #1A2226;
   border: none;
   border-radius: 10px;
   margin-bottom: 10px;
+}
+
+.form-input .form-group *{
+  display: inline;
 }
