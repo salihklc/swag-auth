@@ -10,6 +10,7 @@ var refreshAuth = document.getElementById("refresh-auth")
 var logoutButton = document.getElementById("delete-auth")
 var loginButton = document.getElementById('login-btn');
 var copyToClipboardButton = document.querySelector('#copy-to-clipboard');
+var backToLogin = document.getElementById("back-to-login");
 
 var currentSite = undefined;
 var currentTab = undefined;
@@ -25,6 +26,7 @@ logoutButton.addEventListener('click', removeSelectedUser);
 refreshAuth.addEventListener('click', triggerAuth)
 copyToClipboardButton.addEventListener('click', copyToClipboard)
 currentAuthDropdown.addEventListener('change', authUserDropDownChanged)
+backToLogin.addEventListener('click',backToLoginClicked)
 
 function appStart() {
     try {
@@ -48,17 +50,21 @@ function appStart() {
 }
 
 function initialize() {
-    document.querySelector('span.current-site-name').textContent = currentHost;
+    setCurrentHostName()
     appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
-        console.log(savedItem);
-        if (savedItem !== undefined && savedItem[currentHost] !== undefined) {
+        if (savedItem !== undefined && Object.keys(savedItem).length !== 0) {
+            console.log(savedItem)
             authInfoGlobal = savedItem;
             renderCurrentAuthDropdown();
             clearAndHideLoginShowLogout();
         }
     });
-    document.querySelector("div.page-content").style.display = "block";
+    document.querySelector("div.page-content").classList.remove('hidden');
     loadingDiv(false);
+}
+
+function setCurrentHostName() {
+    document.querySelector('span.current-site-name').textContent = currentHost;
 }
 
 function onError(error) {
@@ -72,37 +78,36 @@ function authAndSaveUserInfo() {
 
     gettingItem.then((result) => {
         let objTest = Object.keys(result);
-        if (objTest.length < 1 && username !== '' && password !== '' || (objTest.length > 0 && objTest[currentHost] == undefined)) {
-            authInfoGlobal[currentHost][inputUsername.value] = {
+        if (objTest.length < 1 && username !== '' && password !== '') {
+            authInfoGlobal[inputUsername.value] = {
                 "username": inputUsername.value,
                 "password": inputPassword.value,
                 "url": authRequestUrl,
                 "token": ""
             };
-            selectedAuth = authInfoGlobal[currentHost][inputUsername.value];
+            selectedAuth = inputUsername.value;
             triggerAuth();
         }
     }, onError);
 }
 
 function removeSelectedUser() {
-    showLoginHideLogout();
-    delete authInfoGlobal[currentHost][selectedAuth]
-    let dbSetCallBack = appBrowserGlobal.storage.local.set(authInfoGlobal);
-    dbSetCallBack.then(() => {
-        renderCurrentAuthDropdown()
-    }, onError);
+    authInfoGlobal[selectedAuth] = undefined
+    delete authInfoGlobal[selectedAuth]
+    storeUserForSite()
+    if(authInfoGlobal.length<0)
+        showLoginHideLogout();
 }
 
 function clearAndHideLoginShowLogout() {
     inputUsername.value = '';
     inputPassword.value = '';
     document.querySelector('.current-auth-content').classList.remove('hidden')
-    document.querySelector('.login-form').classList.add('hidden');
+    document.querySelector('.login-content').classList.add('hidden');
 }
 
 function showLoginHideLogout() {
-    document.querySelector('.login-form').classList.remove('hidden');
+    document.querySelector('.login-content').classList.remove('hidden');
     document.querySelector('.current-auth-content').classList.add('hidden');
 }
 
@@ -111,9 +116,20 @@ function authUserDropDownChanged() {
     triggerAuth()
 }
 
+function backToLoginClicked() {
+    showLoginHideLogout();
+}
+
 async function triggerAuth() {
     loadingDiv(true);
-    let authUserInfo = authInfoGlobal[currentHost][selectedAuth];
+    let authUserInfo = authInfoGlobal[selectedAuth];
+
+    if (authUserInfo == undefined) {
+        showMessages("No valid auth selected")
+        return
+    }
+
+
     await fetch(authUserInfo["url"], {
         method: 'POST',
         headers: {
@@ -162,8 +178,8 @@ function showMessages(message) {
 }
 
 function storeUserForSite() {
-    authInfoGlobal[currentHost][selectedAuth] = selectedAuth;
-    var storingUserInfo = appBrowserGlobal.storage.local.set(authInfoGlobal);
+    objToStoreBySiteName[currentHost] = authInfoGlobal;
+    var storingUserInfo = appBrowserGlobal.storage.local.set(objToStoreBySiteName);
     storingUserInfo.then(() => {
         renderCurrentAuthDropdown()
     }, onError);
