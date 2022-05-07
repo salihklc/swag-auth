@@ -11,6 +11,7 @@ var logoutButton = document.getElementById("delete-auth")
 var loginButton = document.getElementById('login-btn');
 var copyToClipboardButton = document.querySelector('#copy-to-clipboard');
 var backToLogin = document.getElementById("back-to-login");
+var backToUserList = document.getElementById("back-to-userlist");
 
 var currentSite = undefined;
 var currentTab = undefined;
@@ -26,7 +27,8 @@ logoutButton.addEventListener('click', removeSelectedUser);
 refreshAuth.addEventListener('click', triggerAuth)
 copyToClipboardButton.addEventListener('click', copyToClipboard)
 currentAuthDropdown.addEventListener('change', authUserDropDownChanged)
-backToLogin.addEventListener('click',backToLoginClicked)
+backToLogin.addEventListener('click', backToLoginClicked)
+backToUserList.addEventListener('click', backToUserListClicked)
 
 function appStart() {
     try {
@@ -95,7 +97,7 @@ function removeSelectedUser() {
     authInfoGlobal[selectedAuth] = undefined
     delete authInfoGlobal[selectedAuth]
     storeUserForSite()
-    if(authInfoGlobal.length<0)
+    if (authInfoGlobal.length < 0)
         showLoginHideLogout();
 }
 
@@ -118,6 +120,10 @@ function authUserDropDownChanged() {
 
 function backToLoginClicked() {
     showLoginHideLogout();
+}
+
+function backToUserListClicked() {
+    clearAndHideLoginShowLogout();
 }
 
 async function triggerAuth() {
@@ -178,6 +184,7 @@ function showMessages(message) {
 }
 
 function storeUserForSite() {
+    let objToStoreBySiteName = {}
     objToStoreBySiteName[currentHost] = authInfoGlobal;
     var storingUserInfo = appBrowserGlobal.storage.local.set(objToStoreBySiteName);
     storingUserInfo.then(() => {
