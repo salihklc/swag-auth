@@ -1,7 +1,7 @@
 {
     "name": "Swag Auth",
     "description": "Login to any swag UI easly.",
-    "version": "1.0",
+    "version": "1.4.0",
     "manifest_version": 3,
     "permissions": [
         "storage",

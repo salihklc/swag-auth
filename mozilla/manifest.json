@@ -2,7 +2,7 @@
     "description": "Login to any swag UI easly.",
     "manifest_version": 2,
     "name": "Swag Auth",
-    "version": "1.0",
+    "version": "1.4.0",
     "homepage_url": "https://github.com/salihklc/swag-auth",
     "icons": {
         "48": "icons/logo-48.png",
