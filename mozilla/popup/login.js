@@ -50,7 +50,6 @@ function initialize() {
     document.querySelector('span.current-site-name').textContent = currentHost;
     appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
         console.log(savedItem);
-
         if (savedItem !== undefined && savedItem[currentHost] !== undefined && savedItem[currentHost].username !== undefined && savedItem[currentHost].password !== undefined) {
             authInfoGlobal = savedItem;
             clearLoginInputHideLoginShowLogout();

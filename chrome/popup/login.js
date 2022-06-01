@@ -1,7 +1,5 @@
 /* initialise variables */
 console.log("App loading");
-loadingDiv(true);
-
 var inputUsername = document.querySelector('#username');
 var inputPassword = document.querySelector('#password');
 var inputLoginAddress = document.querySelector('#login-address');
@@ -26,34 +24,26 @@ logoutButton.addEventListener('click', removeSelectedUser);
 refreshAuth.addEventListener('click', triggerAuth)
 copyToClipboardButton.addEventListener('click', copyToClipboard)
 currentAuthDropdown.addEventListener('change', authUserDropDownChanged)
-backToLogin.addEventListener('click',backToLoginClicked)
+backToLogin.addEventListener('click', backToLoginClicked)
 
 function appStart() {
     try {
+        loadingDiv(true);
         appBrowserGlobal = chrome;
-        appBrowserGlobal.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-            let tab = tabs[0]
-            var currentTabUrl = "";
-            if (tab == undefined || tab.url == undefined) {
-                currentTabUrl = 'https://google.com'
-            } else {
-                currentTabUrl = tab.url;
-            }
-            currentSite = new URL(currentTabUrl);
-            currentTab = tabs[0];
-            currentHost = currentSite.hostname;
-            initialize();
-        });
+        initialize();
     } catch (e) {
         onError(e)
     }
 }
 
 function initialize() {
-    setCurrentHostName()
-    appBrowserGlobal.storage.local.get(currentHost, function (savedItem) {
+    setCurrentHost(startAppByState)
+}
+
+function startAppByState() {
+    appBrowserGlobal.storage.local.get(currentHost, function (result) {
+        savedItem = result[currentHost];
         if (savedItem !== undefined && Object.keys(savedItem).length !== 0) {
-            console.log(savedItem)
             authInfoGlobal = savedItem;
             renderCurrentAuthDropdown();
             clearAndHideLoginShowLogout();
@@ -63,8 +53,21 @@ function initialize() {
     loadingDiv(false);
 }
 
-function setCurrentHostName() {
-    document.querySelector('span.current-site-name').textContent = currentHost;
+function setCurrentHost(callback) {
+    appBrowserGlobal.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+        let tab = tabs[0]
+        var currentTabUrl = "";
+        if (tab == undefined || tab.url == undefined) {
+            currentTabUrl = 'https://google.com'
+        } else {
+            currentTabUrl = tab.url;
+        }
+        currentSite = new URL(currentTabUrl);
+        currentTab = tab;
+        currentHost = currentSite.hostname;
+        document.querySelector('span.current-site-name').textContent = currentHost;
+        callback()
+    });
 }
 
 function onError(error) {
@@ -77,8 +80,9 @@ function authAndSaveUserInfo() {
     let gettingItem = appBrowserGlobal.storage.local.get(currentHost);
 
     gettingItem.then((result) => {
-        let objTest = Object.keys(result);
-        if (objTest.length < 1 && username !== '' && password !== '') {
+        savedItem = result[currentHost];
+
+        if (savedItem[inputUsername.value] === undefined) {
             authInfoGlobal[inputUsername.value] = {
                 "username": inputUsername.value,
                 "password": inputPassword.value,
@@ -95,7 +99,7 @@ function removeSelectedUser() {
     authInfoGlobal[selectedAuth] = undefined
     delete authInfoGlobal[selectedAuth]
     storeUserForSite()
-    if(authInfoGlobal.length<0)
+    if (authInfoGlobal.length < 0)
         showLoginHideLogout();
 }
 
@@ -125,10 +129,10 @@ async function triggerAuth() {
     let authUserInfo = authInfoGlobal[selectedAuth];
 
     if (authUserInfo == undefined) {
-        showMessages("No valid auth selected")
+        showMessages("No valid auth selected, you can remove the selected auth from the dropdown")
+        loadingDiv(false);
         return
     }
-
 
     await fetch(authUserInfo["url"], {
         method: 'POST',
@@ -178,6 +182,7 @@ function showMessages(message) {
 }
 
 function storeUserForSite() {
+    let objToStoreBySiteName = {};
     objToStoreBySiteName[currentHost] = authInfoGlobal;
     var storingUserInfo = appBrowserGlobal.storage.local.set(objToStoreBySiteName);
     storingUserInfo.then(() => {
@@ -187,14 +192,19 @@ function storeUserForSite() {
 
 function renderCurrentAuthDropdown() {
     var dropDown = document.getElementById("current-auth-dropdown");
+    currentSelectedValue = selectedAuth;
     while (dropDown.options.length) {
         dropDown.remove(0);
     }
-    for (var user in authInfoGlobal[currentHost]) {
+    for (var user in authInfoGlobal) {
         var option = document.createElement("option");
         option.text = user;
         dropDown.add(option);
     }
+    if (currentSelectedValue != undefined)
+        currentAuthDropdown.value = currentSelectedValue;
+    else
+        currentAuthDropdown.value = dropDown.options[0].value
 }
 
 function injectTokenToTab(token) {
