@@ -202,14 +202,18 @@ function renderCurrentAuthDropdown() {
     while (dropDown.options.length) {
         dropDown.remove(0);
     }
+
     for (var user in authInfoGlobal) {
         var option = document.createElement("option");
         option.text = user;
         dropDown.add(option);
     }
+
+    if (dropDown.options.length < 1)
+        selectedAuth = undefined
     if (currentSelectedValue != undefined)
         currentAuthDropdown.value = currentSelectedValue;
-    else
+    if (dropDown.options[0] != undefined)
         currentAuthDropdown.value = dropDown.options[0].value
 }
 

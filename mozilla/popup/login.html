@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" href="login.css" />
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <div class="page-content">
@@ -10,8 +12,14 @@
                 <h2>Swag Auth Helper</h2>
                 <h4>Fill the form to auth : <span class="current-site-name">CurrentSite</span></h3>
             </div>
-            <div class="login-form">
-                <div id="popup-content">
+            <div class="login-content">
+                <div class="container">
+                    <div class="container-header to-right">
+                        <i class="fa fa-arrow-right button-only-icon" aria-hidden="true"
+                            id="back-to-userlist"></i>
+                    </div>
+                </div>
+                <div class="login-form">
                     <div class="form-input">
                         <label for="login-address">Login Url</label>
                         <input type="text" name="login-address"
@@ -26,34 +34,37 @@
                         <input type="password" name="password" id="password">
                     </div>
                     <div class="form-input">
-                        <button class="button" id="save-auth-btn">Login</button>
+                        <button class="button" id="login-btn">Login</button>
                     </div>
                 </div>
             </div>
-            <div class="current-auth hidden">
-                <div id="current-auth-content">
-                    <div class="full-center">
-                        <span> Current Auth For: <span id="auth-username"></span></span>
-                    </div>
-                    <div class="container">
-                        <div class="half-container">
-                            <button class="button full-center"
-                                id="trigger-auth">Trigger Auth</button>
-                        </div>
-                        <div class="half-container">
-                            <button class="button full-center" id="delete-auth">Remove
-                                Auth</button>
-                        </div>
-                    </div>
-                    <div class="container">
-                        <div class="full-container">
-                            <button class="button no-border-background full-center"
-                                id="copy-to-clipboard">
-                                <div class="icon-clipboard"></div>
-                                Copy to Clipboard
+            <div class="current-auth-content hidden">
+                <div class="container-header">
+                    <i class="fa fa-arrow-left button-only-icon" aria-hidden="true"
+                        id="back-to-login"></i>
+                </div>
+                <div class="container">
+                    <div class="form-input">
+                        <span for="Current Auth">Current Auth</span>
+                        <div class="form-group">
+                            <select name="current-auth-dropdown"
+                                id="current-auth-dropdown"
+                                class="center-70">
+                            </select>
+                            <button class="button" id="refresh-auth">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <button class="button" id="delete-auth">
+                                <i class="fa fa-trash"></i>
                             </button>
                         </div>
                     </div>
+                </div>
+                <div class="container">
+                    <button class="button center-full" id="copy-to-clipboard">
+                        <i class="fa fa-copy"></i>
+                        Copy Token
+                    </button>
                 </div>
             </div>
             <div id="error-content" class="hidden">
