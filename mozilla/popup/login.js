@@ -84,7 +84,7 @@ function authAndSaveUserInfo() {
     gettingItem.then((result) => {
         savedItem = result[currentHost];
 
-        if (savedItem[inputUsername.value] === undefined) {
+        if (savedItem == undefined || savedItem[inputUsername.value] === undefined) {
             authInfoGlobal[inputUsername.value] = {
                 "username": inputUsername.value,
                 "password": inputPassword.value,
@@ -181,7 +181,7 @@ async function copyToClipboard() {
 
 function showMessages(message) {
     document.getElementById('error-content').classList.remove('hidden');
-    document.getElementById('error-message').innerHTML = message;
+    document.getElementById('error-message').innerText = message;
     setTimeout(function () {
         document.getElementById('error-content').classList.add('hidden');
     }, 3000)
