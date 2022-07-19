@@ -135,7 +135,7 @@ async function triggerAuth() {
     let authUserInfo = authInfoGlobal[selectedAuth];
 
     if (authUserInfo == undefined) {
-        showMessages("No valid auth selected, you can remove the selected auth from the dropdown")
+        showMessages("No valid auth selected, please return to login page for add new one")
         loadingDiv(false);
         return
     }
@@ -190,21 +190,21 @@ function showMessages(message) {
 function storeUserForSite() {
     let objToStoreBySiteName = {};
     objToStoreBySiteName[currentHost] = authInfoGlobal;
-    var storingUserInfo = appBrowserGlobal.storage.local.set(objToStoreBySiteName);
+    let storingUserInfo = appBrowserGlobal.storage.local.set(objToStoreBySiteName);
     storingUserInfo.then(() => {
         renderCurrentAuthDropdown()
     }, onError);
 }
 
 function renderCurrentAuthDropdown() {
-    var dropDown = document.getElementById("current-auth-dropdown");
-    currentSelectedValue = selectedAuth;
+    let dropDown = document.getElementById("current-auth-dropdown");
+    let currentSelectedValue = selectedAuth;
     while (dropDown.options.length) {
         dropDown.remove(0);
     }
 
-    for (var user in authInfoGlobal) {
-        var option = document.createElement("option");
+    for (let user in authInfoGlobal) {
+        let option = document.createElement("option");
         option.text = user;
         dropDown.add(option);
     }
@@ -213,8 +213,10 @@ function renderCurrentAuthDropdown() {
         selectedAuth = undefined
     if (currentSelectedValue != undefined)
         currentAuthDropdown.value = currentSelectedValue;
-    if (dropDown.options[0] != undefined)
+    else if (dropDown.options[0] != undefined)
         currentAuthDropdown.value = dropDown.options[0].value
+
+    selectedAuth = currentAuthDropdown.value;
 }
 
 function injectTokenToTab(token) {
